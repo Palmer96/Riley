@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -21,6 +21,13 @@ public class PlayerController : MonoBehaviour
     public Transform grapple;
     Vector3 target;
 
+    Vector3 startPos;
+    Vector3 startRot;
+
+    float poisonTimer;
+    public float poisonRate;
+    public bool poisoned;
+    public Text poisonText;
 
     // Use this for initialization
     void Start()
@@ -28,6 +35,14 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         line = GetComponent<LineRenderer>();
+
+        startPos = transform.position;
+        startRot = transform.eulerAngles;
+
+
+
+
+        Reset();
     }
 
     // Update is called once per frame
@@ -78,12 +93,18 @@ public class PlayerController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
             {
-                Vector3 pos = hit.point;
-                pos.z = 0;
-
-                if (Physics.Raycast(transform.position + Vector3.up, pos - transform.position, out hit))
+                if (hit.transform.CompareTag("Grapple"))
                 {
-                    target = hit.point;
+
+                    Vector3 pos = hit.point;
+                    pos.z = 0;
+
+                    if (Physics.Raycast(transform.position + Vector3.up, pos - transform.position, out hit))
+                    {
+                        target = hit.point;
+                    }
+                    grapple.transform.position = transform.position;
+                    line.enabled = true;
                 }
             }
 
@@ -91,31 +112,83 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetMouseButton(0))
         {
-
-            grapple.transform.position = Vector3.MoveTowards(grapple.transform.position, target, 1);
-
-            line.SetPosition(0, transform.position + Vector3.up);
-            line.SetPosition(1, grapple.transform.position);
-
-
-
-           // Pull
-            if (Vector3.Distance(grapple.transform.position, target) < 1)
+            if (target != Vector3.zero)
             {
-                transform.position = Vector3.MoveTowards(transform.position, grapple.transform.position, 0.5f);
+
+                grapple.transform.position = Vector3.MoveTowards(grapple.transform.position, target, 1);
+
+                line.SetPosition(0, transform.position + Vector3.up);
+                line.SetPosition(1, grapple.transform.position);
+
+                // Pull
+                if (Vector3.Distance(grapple.transform.position, target) < 1)
+                {
+                    transform.position = Vector3.MoveTowards(transform.position, grapple.transform.position, 0.5f);
+                }
             }
         }
         else
         {
-            target = transform.position + Vector3.up;
+            target = Vector3.zero;
             grapple.transform.position = Vector3.MoveTowards(grapple.transform.position, target, 1);
 
+            line.enabled = false;
             line.SetPosition(0, transform.position + Vector3.up);
             line.SetPosition(1, grapple.transform.position);
         }
+
+
+
+        if (poisoned)
+        {
+            poisonTimer -= Time.deltaTime;
+            poisonText.text = (Mathf.Round(poisonTimer / 0.1f) * 0.1f).ToString();
+
+            if (poisonTimer <= 0)
+                Reset();
+        }
+        else
+            poisonText.text = "";
 
 
 
     }
 
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Poison"))
+        {
+            if (!poisoned)
+            {
+                poisoned = true;
+                poisonTimer = poisonRate;
+            }
+
+        }
+
+        if (other.CompareTag("Cure"))
+        {
+            if (poisoned)
+            {
+                poisoned = false;
+                Destroy(other.gameObject);
+            }
+
+        }
+    }
+
+    void Reset()
+    {
+        transform.position = startPos;
+        transform.eulerAngles = startRot;
+
+        target = transform.position + Vector3.up;
+        grapple.transform.position = target;
+
+        line.SetPosition(0, transform.position + Vector3.up);
+        line.SetPosition(1, grapple.transform.position);
+        poisoned = false;
+        poisonText.text = "";
+
+    }
 }

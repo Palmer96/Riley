@@ -307,11 +307,11 @@ GameObject:
   - component: {fileID: 95175120529645336}
   - component: {fileID: 136458708424464080}
   - component: {fileID: 54457265897963956}
-  - component: {fileID: 114219808118549248}
   - component: {fileID: 120085792663415042}
+  - component: {fileID: 114219808118549248}
   m_Layer: 0
   m_Name: Ethan
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1836,7 +1836,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1162283454977770}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: -10, y: 5, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children:
   - {fileID: 4486256898142412}
@@ -2503,6 +2503,9 @@ MonoBehaviour:
   airModifier: 0.75
   onGround: 0
   grapple: {fileID: 0}
+  poisonRate: 10
+  poisoned: 0
+  poisonText: {fileID: 0}
 --- !u!120 &120085792663415042
 LineRenderer:
   m_ObjectHideFlags: 1
